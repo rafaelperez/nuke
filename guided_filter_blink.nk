@@ -1,0 +1,536 @@
+#! /Applications/Nuke10.5v5/Nuke10.5v5.app/Contents/MacOS/libnuke-10.5.5.dylib -nx
+version 10.5 v5
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="0" w="1280" h="800" fullscreen="1" screen="0">
+        <splitter orientation="1">
+            <split size="808"/>
+            <splitter orientation="1">
+                <split size="808"/>
+                <dock id="" activePageId="DAG.1" focus="true">
+                    <page id="DAG.1"/>
+                </dock>
+            </splitter>
+            <split size="468"/>
+            <splitter orientation="2">
+                <split size="308"/>
+                <dock id="" hideTitles="1" activePageId="Properties.1">
+                    <page id="Properties.1"/>
+                </dock>
+                <split size="488"/>
+                <dock id="" activePageId="Viewer.1">
+                    <page id="Viewer.1"/>
+                </dock>
+            </splitter>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name /Users/fael/OneDrive/fast-guided-filter-code-v1/guided_filter_blink.nk
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+ colorManagement Nuke
+ workingSpaceLUT linear
+ monitorLut sRGB
+ int8Lut sRGB
+ int16Lut sRGB
+ logLut Cineon
+ floatLut linear
+}
+NoOp {
+ inputs 0
+ name NoOp1
+ xpos -150
+ ypos 63
+ addUserKnob {20 User}
+ addUserKnob {16 radius}
+ radius {60}
+}
+Read {
+ inputs 0
+ file /Users/fael/OneDrive/fast-guided-filter-code-v1/img_feathering/toy_1.png
+ format "556 568 0 0 556 568 1 "
+ origset true
+ name Read3
+ xpos 942
+ ypos -346
+}
+Read {
+ inputs 0
+ file /Users/fael/OneDrive/fast-guided-filter-code-v1/img_feathering/toy_1.png
+ format "556 568 0 0 556 568 1 "
+ origset true
+ name Read1
+ xpos -40
+ ypos -351
+}
+set N20d34ef0 [stack 0]
+IBKColourV3 {
+ name IBKColourV3_1
+ xpos 239
+ ypos -260
+ off {0 0 -0.1}
+ erode 5
+ multi 3
+}
+push $N20d34ef0
+IBKGizmoV3 {
+ inputs 2
+ name IBKGizmoV3_1
+ selected false
+ xpos 167
+ ypos -150
+}
+Constant {
+ inputs 0
+ channels rgb
+ color {0.01161193755 0.06665038317 0.1945800632 0}
+ name Constant2
+ xpos -282
+ ypos -144
+}
+Read {
+ inputs 0
+ file /Users/fael/OneDrive/fast-guided-filter-code-v1/img_feathering/toy-mask_1.png
+ format "556 568 0 0 556 568 1 "
+ origset true
+ raw true
+ name Read2
+ xpos 950
+ ypos -210
+}
+Shuffle {
+ green red
+ blue red
+ alpha red
+ name Shuffle1
+ xpos 950
+ ypos -105
+}
+NoOp {
+ name p
+ tile_color 0xdfff00ff
+ xpos 950
+ ypos -33
+}
+set N2dfd5e50 [stack 0]
+push $N20d34ef0
+Shuffle {
+ red green
+ green blue
+ blue red
+ name Shuffle3
+ xpos -29
+ ypos -240
+ disable true
+}
+Grade {
+ multiply 1.1
+ gamma 123
+ name Grade1
+ xpos -29
+ ypos -216
+}
+Colorspace {
+ colorspace_out sRGB
+ name Colorspace1
+ xpos -40
+ ypos -178
+ disable true
+}
+NoOp {
+ name I
+ tile_color 0xdfff00ff
+ xpos -40
+ ypos -57
+}
+set N20d73fc0 [stack 0]
+Merge {
+ inputs 2
+ operation mult
+ name Merge4
+ xpos 1060
+ ypos 87
+}
+Blur {
+ size {{(parent.NoOp1.radius*2)+1}}
+ name Blur1
+ xpos 1060
+ ypos 179
+}
+set C20d61290 [stack 0]
+NoOp {
+ name Ip_mean
+ tile_color 0xdfff00ff
+ xpos 1060
+ ypos 423
+}
+push $N20d73fc0
+Dot {
+ name Dot2
+ xpos -6
+ ypos 66
+}
+set N20dd5ec0 [stack 0]
+Dot {
+ name Dot6
+ xpos 104
+ ypos 66
+}
+set N46ba1140 [stack 0]
+clone $C20d61290 {
+ xpos 70
+ ypos 203
+ selected false
+}
+NoOp {
+ name I_mean
+ tile_color 0xdfff00ff
+ xpos 70
+ ypos 447
+}
+set N2dfd56f0 [stack 0]
+push $N2dfd5e50
+clone $C20d61290 {
+ xpos 840
+ ypos 179
+ selected false
+}
+NoOp {
+ name p_mean
+ tile_color 0xdfff00ff
+ xpos 840
+ ypos 423
+}
+set N35512f60 [stack 0]
+Merge {
+ inputs 2
+ operation mult
+ name Merge5
+ xpos 730
+ ypos 543
+}
+Merge {
+ inputs 2
+ operation minus
+ name Merge6
+ xpos 1060
+ ypos 567
+}
+NoOp {
+ name Ip_cov
+ tile_color 0xdfff00ff
+ xpos 1060
+ ypos 615
+}
+push $N46ba1140
+Dot {
+ name Dot1
+ xpos 214
+ ypos 66
+}
+set N2dfe7420 [stack 0]
+Dot {
+ name Dot3
+ xpos 544
+ ypos 66
+}
+Expression {
+ expr0 r*g
+ expr1 r*b
+ expr2 g*b
+ name Expression2
+ label "rg, rb, gb"
+ xpos 510
+ ypos 131
+}
+clone $C20d61290 {
+ xpos 510
+ ypos 203
+ selected false
+}
+push $N2dfd56f0
+Expression {
+ expr0 r*g
+ expr1 r*b
+ expr2 g*b
+ name Expression4
+ label "rg, rb, gb"
+ xpos 400
+ ypos 563
+}
+Merge {
+ inputs 2
+ operation minus
+ name Merge3
+ xpos 510
+ ypos 639
+}
+NoOp {
+ name I____
+ tile_color 0xdfff00ff
+ label "rg, rb, gb"
+ xpos 510
+ ypos 827
+}
+Constant {
+ inputs 0
+ channels rgb
+ color 0.00041
+ name Constant1
+ xpos 70
+ ypos 615
+}
+push $N2dfe7420
+Expression {
+ expr0 r*r
+ expr1 g*g
+ expr2 b*b
+ name Expression1
+ label "I*I\n"
+ xpos 180
+ ypos 107
+}
+clone $C20d61290 {
+ xpos 180
+ ypos 203
+ selected false
+}
+push $N2dfd56f0
+Expression {
+ expr0 r*r
+ expr1 g*g
+ expr2 b*b
+ name Expression3
+ label "I*I\n"
+ xpos 70
+ ypos 515
+}
+Merge {
+ inputs 2
+ operation minus
+ name Merge1
+ xpos 180
+ ypos 639
+}
+Merge {
+ inputs 2
+ operation plus
+ bbox B
+ name Merge2
+ xpos 180
+ ypos 735
+}
+NoOp {
+ name I___
+ tile_color 0xdfff00ff
+ label "rr, gg, bb"
+ xpos 180
+ ypos 827
+}
+BlinkScript {
+ inputs 3
+ recompileCount 78
+ ProgramGroup 1
+ KernelDescription "2 \"CopyKernel\" iterate pixelWise c9cb374e097a6e4dcebf1b00ec70e5e787510c423e8defa07542246d9fb219e6 4 \"srcA\" Read Point \"srcB\" Read Point \"srcC\" Read Point \"dst\" Write Point 0 0 0"
+ kernelSource "kernel CopyKernel : ImageComputationKernel<ePixelWise>\n\{\n  Image<eRead, eAccessPoint, eEdgeClamped> srcA;\n  Image<eRead, eAccessPoint, eEdgeClamped> srcB;\n  Image<eRead, eAccessPoint, eEdgeClamped> srcC;\n\n  Image<eWrite> dst;\n\n  void process()\n  \{\n\n    float Irr_var, Igg_var, Ibb_var, Irg_var, Irb_var, Igb_var, Ipr_cov, Ipg_cov, Ipb_cov;\n    float Irr_inv, Irg_inv, Irb_inv, Igg_inv, Igb_inv, Ibb_inv;\n    float I_cov;\n\n    Irr_var = srcA(0);\n    Igg_var = srcA(1);\n    Ibb_var = srcA(2);\n    Irg_var = srcB(0);\n    Irb_var = srcB(1);\n    Igb_var = srcB(2);\n    Ipr_cov = srcC(0);\n    Ipg_cov = srcC(1);\n    Ipb_cov = srcC(2);\n\n    Irr_inv = Igg_var * Ibb_var - Igb_var * Igb_var;\n    Irg_inv = Igb_var * Irb_var - Irg_var * Ibb_var;\n    Irb_inv = Irg_var * Igb_var - Igg_var * Irb_var;\n    Igg_inv = Irr_var * Ibb_var - Irb_var * Irb_var;\n    Igb_inv = Irb_var * Irg_var - Irr_var * Igb_var;\n    Ibb_inv = Irr_var * Igg_var - Irg_var * Irg_var;\n\n    I_cov = Irr_inv * Irr_var + Irg_inv * Irg_var + Irb_inv * Irb_var;\n\n    \n    Irr_inv = Irr_inv / I_cov;\n    Irg_inv = Irg_inv / I_cov;\n    Irb_inv = Irb_inv / I_cov;\n    Igg_inv = Igg_inv / I_cov;\n    Igb_inv = Igb_inv / I_cov;\n    Ibb_inv = Ibb_inv / I_cov;\n    \n    // dst() = srcA();\n    SampleType(dst) d;\n    d.x = Irr_inv * Ipr_cov + Irg_inv * Ipg_cov + Irb_inv * Ipb_cov;\n    d.y = Irg_inv * Ipr_cov + Igg_inv * Ipg_cov + Igb_inv * Ipb_cov;\n    d.z = Irb_inv * Ipr_cov + Igb_inv * Ipg_cov + Ibb_inv * Ipb_cov;\n\n    dst() = d;\n\n  \}\n\};"
+ rebuild ""
+ rebuild_finalise ""
+ name BlinkScript1
+ xpos 510
+ ypos 971
+}
+set N12e89520 [stack 0]
+NoOp {
+ name a
+ tile_color 0xdfff00ff
+ xpos 510
+ ypos 1047
+}
+set N23de47a0 [stack 0]
+clone $C20d61290 {
+ xpos 510
+ ypos 1115
+ selected false
+}
+NoOp {
+ name a_mean
+ tile_color 0xdfff00ff
+ xpos 510
+ ypos 1263
+}
+push $N20dd5ec0
+Dot {
+ name Dot5
+ xpos -6
+ ypos 1098
+}
+Dot {
+ name Dot7
+ xpos 432
+ ypos 1349
+}
+Merge {
+ inputs 2
+ operation mult
+ name Merge11
+ xpos 510
+ ypos 1407
+}
+Expression {
+ expr0 r+g+b
+ expr1 r+g+b
+ expr2 r+g+b
+ name Expression5
+ xpos 510
+ ypos 1456
+}
+push $N35512f60
+push $N2dfd56f0
+push $N23de47a0
+Merge {
+ inputs 2
+ operation mult
+ name Merge7
+ xpos 620
+ ypos 1095
+}
+Dot {
+ name Dot4
+ xpos 1094
+ ypos 1098
+}
+set N46585ba0 [stack 0]
+Shuffle {
+ green red
+ blue red
+ alpha red
+ name ar
+ xpos 840
+ ypos 1239
+}
+Merge {
+ inputs 2
+ operation minus
+ name Merge8
+ xpos 950
+ ypos 1335
+}
+push $N46585ba0
+Shuffle {
+ red green
+ blue green
+ alpha green
+ name ag
+ xpos 1060
+ ypos 1239
+}
+Merge {
+ inputs 2
+ operation minus
+ name Merge9
+ xpos 1060
+ ypos 1383
+}
+push $N46585ba0
+Shuffle {
+ red blue
+ green blue
+ alpha blue
+ name ab
+ xpos 1280
+ ypos 1263
+}
+Merge {
+ inputs 2
+ operation minus
+ name Merge10
+ xpos 1170
+ ypos 1431
+}
+clone $C20d61290 {
+ xpos 1170
+ ypos 1523
+ selected false
+}
+NoOp {
+ name b_mean
+ tile_color 0xdfff00ff
+ xpos 1170
+ ypos 1623
+}
+Merge {
+ inputs 2
+ operation plus
+ name Merge12
+ xpos 1015
+ ypos 1742
+}
+Colorspace {
+ colorspace_in sRGB
+ name Colorspace2
+ xpos 1015
+ ypos 1782
+ disable true
+}
+Shuffle {
+ green red
+ blue red
+ alpha red
+ name Shuffle2
+ xpos 1015
+ ypos 1806
+}
+push $N20d34ef0
+Copy {
+ inputs 2
+ from0 rgba.alpha
+ to0 rgba.alpha
+ name Copy1
+ xpos -420
+ ypos -134
+}
+Premult {
+ name Premult1
+ xpos -420
+ ypos -102
+}
+Merge2 {
+ inputs 2
+ operation under
+ bbox A
+ name Merge13
+ xpos -293
+ ypos -37
+}
+set N799673c0 [stack 0]
+Crop {
+ box {0 0 2048 1556}
+ reformat true
+ crop false
+ name Crop1
+ xpos -293
+ ypos -13
+}
+push $N12e89520
+push 0
+push $N20d34ef0
+push $N799673c0
+Viewer {
+ inputs 4
+ frame 1
+ frame_range 1-100
+ colour_sample_bbox {-0.6043165326 -0.2697841823 -0.6007194519 -0.266187042}
+ samplepoints {{-0.6043165326 -0.2697841823}
+   }
+ gl_buffer_depth half-float
+ useGPUForViewer true
+ name Viewer1
+ selected true
+ xpos -260
+ ypos 1215
+ hide_input true
+}

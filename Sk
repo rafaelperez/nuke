@@ -1,0 +1,76 @@
+skyreplace.group
+#! /Applications/Nuke6.0v1-32/Nuke6.0v1.app/Contents/MacOS/Nuke6.0v1 -nx
+version 6.0 v1
+Group {
+ inputs 2
+ addUserKnob {20 SkyReplace}
+ addUserKnob {41 mix l Amount T Plus.mix}
+}
+ Input {
+  inputs 0
+  name BG
+  xpos 623
+  ypos 141
+  number 1
+ }
+set N19ce5a70 [stack 0]
+ Dot {
+  name Dot1
+  xpos 657
+  ypos 260
+ }
+ Input {
+  inputs 0
+  name FG
+  xpos 381
+  ypos 144
+ }
+set N19ce8a50 [stack 0]
+ Merge2 {
+  inputs 2
+  operation multiply
+  name Mult
+  xpos 381
+  ypos 257
+ }
+push $N19ce8a50
+push $N19ce5a70
+ Merge2 {
+  inputs 2
+  operation plus
+  name Plus
+  selected true
+  xpos 506
+  ypos 144
+ }
+ Clamp {
+  name Clamp3
+  xpos 506
+  ypos 344
+ }
+ Merge2 {
+  inputs 2
+  operation divide
+  name Div
+  xpos 381
+  ypos 349
+ }
+set N19cf7ad0 [stack 0]
+ Viewer {
+  input_process false
+  name Viewer1
+  xpos -68
+  ypos 472
+ }
+push $N19cf7ad0
+ Output {
+  name Output2
+  xpos 381
+  ypos 413
+ }
+end_group
+Comment on gist
+
+Leave a comment
+Comment
+Desktop version
